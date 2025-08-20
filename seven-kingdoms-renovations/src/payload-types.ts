@@ -142,6 +142,26 @@ export interface UserAuthOperations {
 export interface User {
   id: string;
   roles?: ('superAdmin' | 'admin' | 'client')[] | null;
+  personalInfo?: {
+    firstName?: string | null;
+    lastName?: string | null;
+    nickname?: string | null;
+  };
+  contact?: {
+    /**
+     * You can override this at a job level.
+     */
+    generalContactPreference?: ('email' | 'cell' | 'both') | null;
+    email?: string | null;
+    number?: number | null;
+    areTextsOk?: boolean | null;
+  };
+  address?: {
+    streetAddress1?: string | null;
+    city?: string | null;
+    state?: string | null;
+    postalCode?: string | null;
+  };
   avatar?: (string | null) | Media;
   associatedJobs?: {
     docs?: (string | Job)[];
@@ -375,6 +395,29 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   roles?: T;
+  personalInfo?:
+    | T
+    | {
+        firstName?: T;
+        lastName?: T;
+        nickname?: T;
+      };
+  contact?:
+    | T
+    | {
+        generalContactPreference?: T;
+        email?: T;
+        number?: T;
+        areTextsOk?: T;
+      };
+  address?:
+    | T
+    | {
+        streetAddress1?: T;
+        city?: T;
+        state?: T;
+        postalCode?: T;
+      };
   avatar?: T;
   associatedJobs?: T;
   updatedAt?: T;
