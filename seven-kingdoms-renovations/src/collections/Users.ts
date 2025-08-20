@@ -20,12 +20,6 @@ export const Users: CollectionConfig = {
     delete: isAdmin,
   },
   fields: [
-    // {
-    //   name: 'firstName',
-    //   type: 'text',
-    // },
-    // Email added by default
-    // Add more fields as needed
     {
       name: 'roles',
       // Save this field to JWT so we can use from `req.user`
@@ -54,6 +48,119 @@ export const Users: CollectionConfig = {
       ]
     },
     {
+      label: 'Profile Info',
+      type: 'collapsible',
+      admin: {
+        initCollapsed: true,
+      },
+      fields: [
+        {
+          name: 'personalInfo',
+          label: 'Personal',
+          type: 'group',
+          fields: [
+
+            {
+              name: 'firstName',
+              type: 'text',
+            },
+            {
+              name: 'lastName',
+              type: 'text',
+            },
+            {
+              name: 'nickname',
+              type: 'text',
+            },
+          ],
+        },
+        {
+          name: 'contact',
+          label: 'Contact',
+          type: 'group',
+          fields: [
+            {
+              name: 'generalContactPreference',
+              type: 'radio',
+              admin: {
+                description: 'You can override this at a job level.'
+              },
+              options: [
+                {
+                  label: 'Email',
+                  value: 'email',
+                },
+                {
+                  label: 'Cell',
+                  value: 'cell',
+                },
+                {
+                  label: 'Both',
+                  value: 'both',
+                },
+              ],
+            },
+            {
+              name: 'email',
+              type: 'email',
+              admin: {
+                condition: (data) => {
+                  if(data.contact.generalContactPreference === 'email' || data.contact.generalContactPreference === 'both') {
+                    return true;
+                  } { return false }
+                },
+              },
+            },
+            {
+              name: 'number',
+              type: 'number',
+              admin: {
+                condition: (data) => {
+                  if(data.contact.generalContactPreference === 'cell' || data.contact.generalContactPreference === 'both') {
+                    return true;
+                  } { return false }
+                },
+              },
+            },
+            {
+              name: 'areTextsOk',
+              label: 'Are texts okay?',
+              type: 'checkbox',
+              admin: {
+                condition: (data) => {
+                  if (data.contact.generalContactPreference === 'cell' || data.contact.generalContactPreference === 'both') { return true }
+                  else { return false }
+                }
+              },
+            },
+          ],
+        },
+        {
+          name: 'address',
+          label: 'Address',
+          type: 'group',
+          fields: [
+            {
+              name: 'streetAddress1',
+              type: 'text',
+            },
+            {
+              name: 'city',
+              type: 'text',
+            },
+            {
+              name: 'state',
+              type: 'text',
+            },
+            {
+              name: 'postalCode',
+              type: 'text',
+            },
+          ],
+        },
+      ],
+    },
+    {
       name: 'avatar',
       type: 'upload',
       relationTo: 'media',
@@ -64,22 +171,5 @@ export const Users: CollectionConfig = {
       collection: 'jobs',
       on: 'Job is for',
     },
-    // {
-    //   name: 'jobs',
-    //   // Save this field to JWT so we can use from `req.user`
-    //   saveToJWT: true,
-    //   type: 'relationship',
-    //   relationTo: 'jobs',
-    //   hasMany: true,
-    //   access: {
-    //     // Only admins can create or update a value for this field
-    //     create: isAdminFieldLevel,
-    //     update: isAdminFieldLevel,
-    //   },
-    //   admin: {
-    //     condition: ({ roles }) => roles && !roles.includes('admin'),
-    //     description: 'This field sets which jobs that this user has access to.'
-    //   }
-    // }
   ],
 }
