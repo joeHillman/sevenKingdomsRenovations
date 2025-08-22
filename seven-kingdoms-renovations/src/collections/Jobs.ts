@@ -7,8 +7,9 @@ import { isAdminOrSelf } from '@/access/isAdminOrSelf';
 
 export const Jobs: CollectionConfig = {
   slug: 'jobs',
+  // need a better field name for this, it's link to the media
   admin: {
-    useAsTitle: 'address'
+    useAsTitle: 'title'
   },
   access: {
     create: isAdmin,
@@ -54,10 +55,29 @@ export const Jobs: CollectionConfig = {
       defaultValue: uuidv4(),
       required: true,
     },
-    {
-      name: 'address',
-      type: 'text',
-    },
+      {
+        name: 'address',
+        label: 'Address',
+        type: 'group',
+        fields: [
+          {
+            name: 'streetAddress1',
+            type: 'text',
+          },
+          {
+            name: 'city',
+            type: 'text',
+          },
+          {
+            name: 'state',
+            type: 'text',
+          },
+          {
+            name: 'postalCode',
+            type: 'text',
+          },
+        ],
+      },
     {
       name: 'status',
       type: 'select',

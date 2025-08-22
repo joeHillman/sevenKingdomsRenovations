@@ -250,7 +250,12 @@ export interface Media {
 export interface Job {
   title?: string | null;
   id: string;
-  address?: string | null;
+  address?: {
+    streetAddress1?: string | null;
+    city?: string | null;
+    state?: string | null;
+    postalCode?: string | null;
+  };
   status?: ('pending' | 'scheduled' | 'inProgress' | 'onHold' | 'canceled') | null;
   scheduledFor?: string | null;
   reasonForHold?: string | null;
@@ -456,7 +461,14 @@ export interface InteractionsSelect<T extends boolean = true> {
 export interface JobsSelect<T extends boolean = true> {
   title?: T;
   id?: T;
-  address?: T;
+  address?:
+    | T
+    | {
+        streetAddress1?: T;
+        city?: T;
+        state?: T;
+        postalCode?: T;
+      };
   status?: T;
   scheduledFor?: T;
   reasonForHold?: T;
