@@ -258,6 +258,7 @@ export interface Job {
   };
   status?: ('pending' | 'scheduled' | 'inProgress' | 'onHold' | 'canceled') | null;
   scheduledFor?: string | null;
+  specialInstructions?: string | null;
   reasonForHold?: string | null;
   reasonForCancel?: string | null;
   'Job is for'?: (string | null) | User;
@@ -471,6 +472,7 @@ export interface JobsSelect<T extends boolean = true> {
       };
   status?: T;
   scheduledFor?: T;
+  specialInstructions?: T;
   reasonForHold?: T;
   reasonForCancel?: T;
   'Job is for'?: T;

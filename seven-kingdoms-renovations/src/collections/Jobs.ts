@@ -34,11 +34,34 @@ export const Jobs: CollectionConfig = {
         }
 
         if(operation === 'update') {
-          req.payload.sendEmail({
-            to: 'joerhillman@gmail.com',
-            subject: `${doc.address} - Can still see framing around the door...`,
-            text: 'If I were Cersei Lannister, I\'d have your head on a spike!',
-          });
+          if(doc.status === 'scheduled') {
+            req.payload.sendEmail({
+              to: 'joerhillman@gmail.com',
+              subject: `The ${doc.title} job has been scheduled. `,
+              text: `The ${doc.title} job has been scheduled for ${doc.scheduledFor}. ${doc?.specialInstructions && doc.specialInstructions}`,
+            });
+          }
+          if(doc.status === 'inProgress') {
+            req.payload.sendEmail({
+              to: 'joerhillman@gmail.com',
+              subject: `The ${doc.title} job has been started. `,
+              text: `This is just to let you know we've begun the job.`,
+            });
+          }
+          if(doc.status === 'onHold') {
+            req.payload.sendEmail({
+              to: 'joerhillman@gmail.com',
+              subject: `Apologies, the ${doc.title} job has been put on hold. `,
+              text: `${doc.reasonForHold}`,
+            });
+          }
+          if(doc.status === 'canceled') {
+            req.payload.sendEmail({
+              to: 'joerhillman@gmail.com',
+              subject: `The ${doc.title} job has been canceled. `,
+              text: `${doc.reasonForCancel}`,
+            });
+          }
         }
       }
     ]
@@ -113,6 +136,16 @@ export const Jobs: CollectionConfig = {
           if(data.status === 'scheduled') { return true }
         }
       }
+    },
+    {
+      name: 'specialInstructions',
+      label: 'Special Instructions',
+      type: 'text',
+      admin: {
+        condition: (data, siblingData, {user}) => {
+          if(data.status === 'scheduled') { return true }
+        }
+      },
     },
     {
       name: `reasonForHold`,
