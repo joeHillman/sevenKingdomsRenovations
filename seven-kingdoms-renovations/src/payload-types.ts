@@ -72,7 +72,7 @@ export interface Config {
     jobs: Job;
     media: Media;
     teams: Team;
-    gallery: Gallery;
+    galleries: Gallery;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -94,7 +94,7 @@ export interface Config {
     jobs: JobsSelect<false> | JobsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     teams: TeamsSelect<false> | TeamsSelect<true>;
-    gallery: GallerySelect<false> | GallerySelect<true>;
+    galleries: GalleriesSelect<false> | GalleriesSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -192,7 +192,28 @@ export interface User {
  */
 export interface Media {
   id: string;
+  caption?: string | null;
+  /**
+   * Process is for a walkthru, demonstration is for a presentation. Job site is for job image, example is for info from client.
+   */
+  mediaTags?:
+    | (
+        | 'before'
+        | 'working'
+        | 'after'
+        | 'process'
+        | 'demonstration'
+        | 'avatar'
+        | 'jobSite'
+        | 'example'
+        | 'bathroom'
+        | 'entryway'
+      )[]
+    | null;
   forGallery?: boolean | null;
+  /**
+   * For now, you'll need to manage a single one being selected.
+   */
   coverImage?: boolean | null;
   /**
    * Process is for a walkthru, demonstration is for a presentation. Job site is for job image, example is for info from client.
@@ -308,19 +329,28 @@ export interface Meta {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "gallery".
+ * via the `definition` "galleries".
  */
 export interface Gallery {
   id: string;
-  gallery?:
-    | {
-        title?: string | null;
-        image: (string | Media)[];
-        id?: string | null;
-      }[]
-    | null;
+  title?: string | null;
+  layout?: GalleryBlock[] | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "GalleryBlock".
+ */
+export interface GalleryBlock {
+  galleryForJob?: (string | null) | Job;
+  images: {
+    imageArray: (string | Media)[];
+    caption?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'gallery';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -350,7 +380,7 @@ export interface PayloadLockedDocument {
         value: string | Team;
       } | null)
     | ({
-        relationTo: 'gallery';
+        relationTo: 'galleries';
         value: string | Gallery;
       } | null);
   globalSlug?: string | null;
@@ -485,6 +515,8 @@ export interface JobsSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
+  caption?: T;
+  mediaTags?: T;
   forGallery?: T;
   coverImage?: T;
   typeOf?: T;
@@ -556,18 +588,32 @@ export interface MetaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "gallery_select".
+ * via the `definition` "galleries_select".
  */
-export interface GallerySelect<T extends boolean = true> {
-  gallery?:
+export interface GalleriesSelect<T extends boolean = true> {
+  title?: T;
+  layout?:
     | T
     | {
-        title?: T;
-        image?: T;
-        id?: T;
+        gallery?: T | GalleryBlockSelect<T>;
       };
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "GalleryBlock_select".
+ */
+export interface GalleryBlockSelect<T extends boolean = true> {
+  galleryForJob?: T;
+  images?:
+    | T
+    | {
+        imageArray?: T;
+        caption?: T;
+      };
+  id?: T;
+  blockName?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

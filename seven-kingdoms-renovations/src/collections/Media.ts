@@ -1,41 +1,17 @@
 import type { CollectionConfig } from 'payload'
 
-export const Media: CollectionConfig = {
-  slug: 'media',
-  access: {
-    read: () => true,
-  },
-  fields: [
-      {
-        name: 'forGallery',
-        label: 'For Gallery',
-        type: 'checkbox',
-        hooks: {
-          afterRead: [
-            async ({value, siblingData}) => {
-              if(!value) {siblingData.coverImage = false}
-            }
-          ]
+const tagOptions = [
+        {
+          label: 'Bathroom',
+          value: 'bathroom',
         },
-      },
-      {
-        name: 'coverImage',
-        label: 'Cover Image',
-        type: 'checkbox',
-        admin: {
-          condition: (data) => {
-            if(data.forGallery) { return true }
-          }
+        {
+          label: 'Entryway',
+          value: 'entryway',
         },
-      },
-    {
-      label: 'Type Of',
-      name: 'typeOf',
-      type: 'select',
-      admin: {
-        description: `Process is for a walkthru, demonstration is for a presentation. Job site is for job image, example is for info from client.`
-      },
-      options: [
+]
+
+const typeOfOptions = [
         {
           label: 'Before',
           value: 'before',
@@ -68,7 +44,60 @@ export const Media: CollectionConfig = {
           label: 'Example',
           value: 'example',
         },
-      ],
+      ]
+
+export const Media: CollectionConfig = {
+  slug: 'media',
+  access: {
+    read: () => true,
+  },
+  fields: [
+      {
+        name: 'caption',
+        label: 'Image Caption',
+        type: 'text',
+      },
+      {
+        label: 'Media Tags',
+        name: 'mediaTags',
+        type: 'select',
+        hasMany: true,
+        admin: {
+          description: `Process is for a walkthru, demonstration is for a presentation. Job site is for job image, example is for info from client.`
+        },
+        options: [...typeOfOptions, ...tagOptions],
+      },
+      {
+        name: 'forGallery',
+        label: 'For Gallery',
+        type: 'checkbox',
+        hooks: {
+          afterRead: [
+            async ({value, siblingData}) => {
+              if(!value) {siblingData.coverImage = false}
+            }
+          ]
+        },
+      },
+      {
+        name: 'coverImage',
+        label: 'Cover Image',
+        type: 'checkbox',
+        admin: {
+          description: 'For now, you\'ll need to manage a single one being selected.',
+          condition: (data) => {
+            if(data.forGallery) { return true }
+          }
+        },
+      },
+    {
+      label: 'Type Of',
+      name: 'typeOf',
+      type: 'select',
+      admin: {
+        description: `Process is for a walkthru, demonstration is for a presentation. Job site is for job image, example is for info from client.`
+      },
+      options: [...typeOfOptions],
     },
     {
       name: 'alt',
