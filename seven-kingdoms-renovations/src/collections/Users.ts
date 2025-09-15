@@ -75,6 +75,11 @@ export const Users: CollectionConfig = {
           ],
         },
         {
+          name: 'Client service address is',
+          type: 'relationship',
+          relationTo: 'serviceAddresses',
+        },
+        {
           name: 'contact',
           label: 'Contact',
           type: 'group',
@@ -132,29 +137,6 @@ export const Users: CollectionConfig = {
                   else { return false }
                 }
               },
-            },
-          ],
-        },
-        {
-          name: 'address',
-          label: 'Address',
-          type: 'group',
-          fields: [
-            {
-              name: 'streetAddress1',
-              type: 'text',
-            },
-            {
-              name: 'city',
-              type: 'text',
-            },
-            {
-              name: 'state',
-              type: 'text',
-            },
-            {
-              name: 'postalCode',
-              type: 'text',
             },
           ],
         },

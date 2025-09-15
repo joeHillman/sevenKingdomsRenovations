@@ -78,29 +78,11 @@ export const Jobs: CollectionConfig = {
       defaultValue: uuidv4(),
       required: true,
     },
-      {
-        name: 'address',
-        label: 'Address',
-        type: 'group',
-        fields: [
-          {
-            name: 'streetAddress1',
-            type: 'text',
-          },
-          {
-            name: 'city',
-            type: 'text',
-          },
-          {
-            name: 'state',
-            type: 'text',
-          },
-          {
-            name: 'postalCode',
-            type: 'text',
-          },
-        ],
-      },
+    {
+      name: 'Job is located at',
+      type: 'relationship',
+      relationTo: 'serviceAddresses',
+    },
     {
       name: 'status',
       type: 'select',
@@ -171,6 +153,12 @@ export const Jobs: CollectionConfig = {
       name: 'Job is for',
       type: 'relationship',
       relationTo: 'users',
+    },
+    {
+      name: 'associatedGalleries',
+      type: 'join',
+      collection: 'galleries',
+      on: 'galleryForJob'
     },
     {
       name: 'associatedPhotos',
