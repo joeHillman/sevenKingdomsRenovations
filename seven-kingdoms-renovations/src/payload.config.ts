@@ -13,6 +13,7 @@ import { Interactions } from './collections/Interactions'
 import { Jobs } from './collections/Jobs'
 import { Media } from './collections/Media'
 import { Users } from './collections/Users'
+import { ServiceAddresses } from './collections/ServiceAddresses'
 import { Teams } from './collections/Teams'
 import { Shareables } from './globals/Shareables';
 
@@ -26,7 +27,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Interactions, Jobs, Media, Teams, Galleries],
+  collections: [Users, Interactions, Jobs, Media, Teams, Galleries, ServiceAddresses],
   editor: lexicalEditor(),
   globals: [Shareables],
   secret: process.env.PAYLOAD_SECRET || '',
