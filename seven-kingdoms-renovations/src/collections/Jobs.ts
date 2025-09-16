@@ -79,7 +79,8 @@ export const Jobs: CollectionConfig = {
       required: true,
     },
     {
-      name: 'Job is located at',
+      name: 'jobLocation',
+      label: 'Job is located at',
       type: 'relationship',
       relationTo: 'serviceAddresses',
     },

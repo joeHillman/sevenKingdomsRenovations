@@ -5,9 +5,9 @@ export const ServiceAddresses: CollectionConfig = {
   access: {
     read: () => true,
   },
-
   admin: {
-    useAsTitle: 'title'
+    useAsTitle: 'title',
+    description: 'You will require a service address for clients and jobs. You can view a total of things, like jobs or galleries for each service address.',
   }, 
   // TODO: there can only be one cover image
   // bulk upload works
@@ -56,6 +56,18 @@ export const ServiceAddresses: CollectionConfig = {
           required: false,
         },
       ],
+    },
+    {
+      name: 'associatedJobs',
+      type: 'join',
+      collection: 'jobs',
+      on: 'jobLocation'
+    },
+    {
+      name: 'associatedGalleries',
+      type: 'join',
+      collection: 'galleries',
+      on: 'galleryForServiceAddress',
     },
   ]
 }
