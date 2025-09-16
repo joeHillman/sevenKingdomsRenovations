@@ -15,6 +15,12 @@ export const Galleries: CollectionConfig = {
 
   fields: [
     {
+      name: 'galleryForServiceAddress',
+      label: 'Gallery Is For Service Address',
+      type: 'relationship',
+      relationTo: 'serviceAddresses',
+    },
+    {
       name: 'galleryForJob',
       label: 'Gallery Is For Job',
       type: 'relationship',

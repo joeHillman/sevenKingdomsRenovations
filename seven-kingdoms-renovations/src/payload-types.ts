@@ -89,6 +89,10 @@ export interface Config {
     media: {
       associatedInteractions: 'interactions';
     };
+    serviceAddresses: {
+      associatedJobs: 'jobs';
+      associatedGalleries: 'galleries';
+    };
   };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
@@ -185,6 +189,8 @@ export interface User {
   password?: string | null;
 }
 /**
+ * You will require a service address for clients and jobs. You can view a total of things, like jobs or galleries for each service address.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "serviceAddresses".
  */
@@ -196,6 +202,58 @@ export interface ServiceAddress {
     city: string;
     state: string;
     postalCode?: string | null;
+  };
+  associatedJobs?: {
+    docs?: (string | Job)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  associatedGalleries?: {
+    docs?: (string | Gallery)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jobs".
+ */
+export interface Job {
+  title?: string | null;
+  id: string;
+  jobLocation?: (string | null) | ServiceAddress;
+  status?: ('pending' | 'scheduled' | 'inProgress' | 'onHold' | 'canceled') | null;
+  scheduledFor?: string | null;
+  specialInstructions?: string | null;
+  reasonForHold?: string | null;
+  reasonForCancel?: string | null;
+  'Job is for'?: (string | null) | User;
+  associatedGalleries?: {
+    docs?: (string | Gallery)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  associatedPhotos?: {
+    docs?: (string | Media)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "galleries".
+ */
+export interface Gallery {
+  id: string;
+  galleryForServiceAddress?: (string | null) | ServiceAddress;
+  galleryForJob?: (string | null) | Job;
+  caption?: string | null;
+  images: {
+    imageArray: (string | Media)[];
   };
   updatedAt: string;
   createdAt: string;
@@ -277,47 +335,6 @@ export interface Media {
       filename?: string | null;
     };
   };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "jobs".
- */
-export interface Job {
-  title?: string | null;
-  id: string;
-  'Job is located at'?: (string | null) | ServiceAddress;
-  status?: ('pending' | 'scheduled' | 'inProgress' | 'onHold' | 'canceled') | null;
-  scheduledFor?: string | null;
-  specialInstructions?: string | null;
-  reasonForHold?: string | null;
-  reasonForCancel?: string | null;
-  'Job is for'?: (string | null) | User;
-  associatedGalleries?: {
-    docs?: (string | Gallery)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  associatedPhotos?: {
-    docs?: (string | Media)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "galleries".
- */
-export interface Gallery {
-  id: string;
-  galleryForJob?: (string | null) | Job;
-  caption?: string | null;
-  images: {
-    imageArray: (string | Media)[];
-  };
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -492,7 +509,7 @@ export interface InteractionsSelect<T extends boolean = true> {
 export interface JobsSelect<T extends boolean = true> {
   title?: T;
   id?: T;
-  'Job is located at'?: T;
+  jobLocation?: T;
   status?: T;
   scheduledFor?: T;
   specialInstructions?: T;
@@ -585,6 +602,7 @@ export interface MetaSelect<T extends boolean = true> {
  * via the `definition` "galleries_select".
  */
 export interface GalleriesSelect<T extends boolean = true> {
+  galleryForServiceAddress?: T;
   galleryForJob?: T;
   caption?: T;
   images?:
@@ -609,6 +627,8 @@ export interface ServiceAddressesSelect<T extends boolean = true> {
         state?: T;
         postalCode?: T;
       };
+  associatedJobs?: T;
+  associatedGalleries?: T;
   updatedAt?: T;
   createdAt?: T;
 }
