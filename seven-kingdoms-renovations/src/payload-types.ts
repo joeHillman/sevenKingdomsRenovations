@@ -90,6 +90,7 @@ export interface Config {
       associatedInteractions: 'interactions';
     };
     serviceAddresses: {
+      associatedPeople: 'users';
       associatedJobs: 'jobs';
       associatedGalleries: 'galleries';
     };
@@ -154,7 +155,7 @@ export interface User {
     lastName?: string | null;
     nickname?: string | null;
   };
-  'Client service address is'?: (string | null) | ServiceAddress;
+  clientServiceAddresses?: (string | ServiceAddress)[] | null;
   contact?: {
     /**
      * You can override this at a job level.
@@ -196,12 +197,21 @@ export interface User {
  */
 export interface ServiceAddress {
   id: string;
-  title?: string | null;
+  /**
+   * This will be the title displayed on the web page for this address.
+   */
+  displayTitle?: string | null;
+  fullAddress?: string | null;
   address: {
     streetAddress1: string;
     city: string;
     state: string;
     postalCode?: string | null;
+  };
+  associatedPeople?: {
+    docs?: (string | User)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
   };
   associatedJobs?: {
     docs?: (string | Job)[];
@@ -462,7 +472,7 @@ export interface UsersSelect<T extends boolean = true> {
         lastName?: T;
         nickname?: T;
       };
-  'Client service address is'?: T;
+  clientServiceAddresses?: T;
   contact?:
     | T
     | {
@@ -618,7 +628,8 @@ export interface GalleriesSelect<T extends boolean = true> {
  * via the `definition` "serviceAddresses_select".
  */
 export interface ServiceAddressesSelect<T extends boolean = true> {
-  title?: T;
+  displayTitle?: T;
+  fullAddress?: T;
   address?:
     | T
     | {
@@ -627,6 +638,7 @@ export interface ServiceAddressesSelect<T extends boolean = true> {
         state?: T;
         postalCode?: T;
       };
+  associatedPeople?: T;
   associatedJobs?: T;
   associatedGalleries?: T;
   updatedAt?: T;

@@ -75,9 +75,11 @@ export const Users: CollectionConfig = {
           ],
         },
         {
-          name: 'Client service address is',
+          name: 'clientServiceAddresses',
+          label: 'Client Service Addresses',
           type: 'relationship',
           relationTo: 'serviceAddresses',
+          hasMany: true,
         },
         {
           name: 'contact',
