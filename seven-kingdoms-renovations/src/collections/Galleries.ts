@@ -10,7 +10,6 @@ export const Galleries: CollectionConfig = {
   },
   
   // TODO: there can only be one cover image
-  // bulk upload works
   // media could use further organization, like dealing with pikies, this will get messy!
 
   fields: [
@@ -28,13 +27,13 @@ export const Galleries: CollectionConfig = {
     },
     {
       name: 'caption',
-      type: 'text',
       label: 'Gallery Caption',
+      type: 'text',
     },
     {
       name: 'images',
-      type: 'group',
       label: 'Gallery Images',
+      type: 'group',
       fields: [
         {
           name: 'imageArray',

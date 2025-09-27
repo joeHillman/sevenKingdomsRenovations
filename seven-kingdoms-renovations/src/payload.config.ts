@@ -27,7 +27,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Interactions, Jobs, Media, Teams, Galleries, ServiceAddresses],
+  collections: [ServiceAddresses, Users, Jobs, Media, Galleries, Interactions, Teams],
   editor: lexicalEditor(),
   globals: [Shareables],
   secret: process.env.PAYLOAD_SECRET || '',

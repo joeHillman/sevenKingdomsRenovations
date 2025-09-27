@@ -67,18 +67,23 @@ export interface Config {
   };
   blocks: {};
   collections: {
+    serviceAddresses: ServiceAddress;
     users: User;
-    interactions: Interaction;
     jobs: Job;
     media: Media;
-    teams: Team;
     galleries: Gallery;
-    serviceAddresses: ServiceAddress;
+    interactions: Interaction;
+    teams: Team;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
   collectionsJoins: {
+    serviceAddresses: {
+      associatedPeople: 'users';
+      associatedJobs: 'jobs';
+      associatedGalleries: 'galleries';
+    };
     users: {
       associatedJobs: 'jobs';
     };
@@ -89,19 +94,15 @@ export interface Config {
     media: {
       associatedInteractions: 'interactions';
     };
-    serviceAddresses: {
-      associatedJobs: 'jobs';
-      associatedGalleries: 'galleries';
-    };
   };
   collectionsSelect: {
+    serviceAddresses: ServiceAddressesSelect<false> | ServiceAddressesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
-    interactions: InteractionsSelect<false> | InteractionsSelect<true>;
     jobs: JobsSelect<false> | JobsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    teams: TeamsSelect<false> | TeamsSelect<true>;
     galleries: GalleriesSelect<false> | GalleriesSelect<true>;
-    serviceAddresses: ServiceAddressesSelect<false> | ServiceAddressesSelect<true>;
+    interactions: InteractionsSelect<false> | InteractionsSelect<true>;
+    teams: TeamsSelect<false> | TeamsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -143,22 +144,64 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * You will require a service address for clients and jobs. You can view a total of things, like jobs or galleries for each service address.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "serviceAddresses".
+ */
+export interface ServiceAddress {
+  id: string;
+  /**
+   * This will be the title displayed on the web page for this address.
+   */
+  displayTitle?: string | null;
+  /**
+   * This field is not editable and will autopopulate with the address once it's been saved.
+   */
+  fullAddress?: string | null;
+  address: {
+    streetAddress1: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    apartmentNumber?: string | null;
+  };
+  associatedPeople?: {
+    docs?: (string | User)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  associatedJobs?: {
+    docs?: (string | Job)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  associatedGalleries?: {
+    docs?: (string | Gallery)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
   id: string;
   roles?: ('superAdmin' | 'admin' | 'client')[] | null;
-  personalInfo?: {
-    firstName?: string | null;
-    lastName?: string | null;
+  /**
+   * This field is not editable and will autopopulate with the full name once it's been saved.
+   */
+  nameAsTitle?: string | null;
+  personalInfo: {
+    firstName: string;
+    lastName: string;
     nickname?: string | null;
   };
-  'Client service address is'?: (string | null) | ServiceAddress;
+  clientServiceAddresses?: (string | ServiceAddress)[] | null;
   contact?: {
-    /**
-     * You can override this at a job level.
-     */
     generalContactPreference?: ('email' | 'cell' | 'both') | null;
     email?: string | null;
     number?: number | null;
@@ -187,76 +230,6 @@ export interface User {
       }[]
     | null;
   password?: string | null;
-}
-/**
- * You will require a service address for clients and jobs. You can view a total of things, like jobs or galleries for each service address.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "serviceAddresses".
- */
-export interface ServiceAddress {
-  id: string;
-  title?: string | null;
-  address: {
-    streetAddress1: string;
-    city: string;
-    state: string;
-    postalCode?: string | null;
-  };
-  associatedJobs?: {
-    docs?: (string | Job)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  associatedGalleries?: {
-    docs?: (string | Gallery)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "jobs".
- */
-export interface Job {
-  title?: string | null;
-  id: string;
-  jobLocation?: (string | null) | ServiceAddress;
-  status?: ('pending' | 'scheduled' | 'inProgress' | 'onHold' | 'canceled') | null;
-  scheduledFor?: string | null;
-  specialInstructions?: string | null;
-  reasonForHold?: string | null;
-  reasonForCancel?: string | null;
-  'Job is for'?: (string | null) | User;
-  associatedGalleries?: {
-    docs?: (string | Gallery)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  associatedPhotos?: {
-    docs?: (string | Media)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "galleries".
- */
-export interface Gallery {
-  id: string;
-  galleryForServiceAddress?: (string | null) | ServiceAddress;
-  galleryForJob?: (string | null) | Job;
-  caption?: string | null;
-  images: {
-    imageArray: (string | Media)[];
-  };
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -338,6 +311,66 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jobs".
+ */
+export interface Job {
+  /**
+   * This is how the job is displayed on your site.
+   */
+  title?: string | null;
+  jobReminders?: string | null;
+  /**
+   * The person who pays for the job and likely the contact person.
+   */
+  jobIsFor: string | User;
+  jobLocation?: (string | null) | ServiceAddress;
+  /**
+   * Emails or texts will be send when this value is saved.
+   */
+  status?: ('pending' | 'scheduled' | 'inProgress' | 'onHold' | 'canceled') | null;
+  /**
+   * Emails or texts will be send when this value is saved.
+   */
+  scheduledFor?: string | null;
+  specialInstructions?: string | null;
+  reasonForHold?: string | null;
+  reasonForCancel?: string | null;
+  isPrimaryContact?: boolean | null;
+  /**
+   * Use if the contact person is different than who is paying, otherwise leave it blank.
+   */
+  contactPerson?: (string | null) | User;
+  associatedGalleries?: {
+    docs?: (string | Gallery)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  associatedPhotos?: {
+    docs?: (string | Media)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  id: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "galleries".
+ */
+export interface Gallery {
+  id: string;
+  galleryForServiceAddress?: (string | null) | ServiceAddress;
+  galleryForJob?: (string | null) | Job;
+  caption?: string | null;
+  images: {
+    imageArray: (string | Media)[];
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "interactions".
  */
 export interface Interaction {
@@ -380,12 +413,12 @@ export interface PayloadLockedDocument {
   id: string;
   document?:
     | ({
-        relationTo: 'users';
-        value: string | User;
+        relationTo: 'serviceAddresses';
+        value: string | ServiceAddress;
       } | null)
     | ({
-        relationTo: 'interactions';
-        value: string | Interaction;
+        relationTo: 'users';
+        value: string | User;
       } | null)
     | ({
         relationTo: 'jobs';
@@ -396,16 +429,16 @@ export interface PayloadLockedDocument {
         value: string | Media;
       } | null)
     | ({
-        relationTo: 'teams';
-        value: string | Team;
-      } | null)
-    | ({
         relationTo: 'galleries';
         value: string | Gallery;
       } | null)
     | ({
-        relationTo: 'serviceAddresses';
-        value: string | ServiceAddress;
+        relationTo: 'interactions';
+        value: string | Interaction;
+      } | null)
+    | ({
+        relationTo: 'teams';
+        value: string | Team;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -451,10 +484,33 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "serviceAddresses_select".
+ */
+export interface ServiceAddressesSelect<T extends boolean = true> {
+  displayTitle?: T;
+  fullAddress?: T;
+  address?:
+    | T
+    | {
+        streetAddress1?: T;
+        city?: T;
+        state?: T;
+        postalCode?: T;
+        apartmentNumber?: T;
+      };
+  associatedPeople?: T;
+  associatedJobs?: T;
+  associatedGalleries?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
   roles?: T;
+  nameAsTitle?: T;
   personalInfo?:
     | T
     | {
@@ -462,7 +518,7 @@ export interface UsersSelect<T extends boolean = true> {
         lastName?: T;
         nickname?: T;
       };
-  'Client service address is'?: T;
+  clientServiceAddresses?: T;
   contact?:
     | T
     | {
@@ -492,32 +548,23 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "interactions_select".
- */
-export interface InteractionsSelect<T extends boolean = true> {
-  'type of'?: T;
-  status?: T;
-  content?: T;
-  'Is for'?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "jobs_select".
  */
 export interface JobsSelect<T extends boolean = true> {
   title?: T;
-  id?: T;
+  jobReminders?: T;
+  jobIsFor?: T;
   jobLocation?: T;
   status?: T;
   scheduledFor?: T;
   specialInstructions?: T;
   reasonForHold?: T;
   reasonForCancel?: T;
-  'Job is for'?: T;
+  isPrimaryContact?: T;
+  contactPerson?: T;
   associatedGalleries?: T;
   associatedPhotos?: T;
+  id?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -582,23 +629,6 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "teams_select".
- */
-export interface TeamsSelect<T extends boolean = true> {
-  pageMeta?: T | MetaSelect<T>;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Meta_select".
- */
-export interface MetaSelect<T extends boolean = true> {
-  title?: T;
-  description?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "galleries_select".
  */
 export interface GalleriesSelect<T extends boolean = true> {
@@ -615,22 +645,32 @@ export interface GalleriesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "serviceAddresses_select".
+ * via the `definition` "interactions_select".
  */
-export interface ServiceAddressesSelect<T extends boolean = true> {
-  title?: T;
-  address?:
-    | T
-    | {
-        streetAddress1?: T;
-        city?: T;
-        state?: T;
-        postalCode?: T;
-      };
-  associatedJobs?: T;
-  associatedGalleries?: T;
+export interface InteractionsSelect<T extends boolean = true> {
+  'type of'?: T;
+  status?: T;
+  content?: T;
+  'Is for'?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teams_select".
+ */
+export interface TeamsSelect<T extends boolean = true> {
+  pageMeta?: T | MetaSelect<T>;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Meta_select".
+ */
+export interface MetaSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -675,25 +715,8 @@ export interface Shareable {
   facebook?: string | null;
   instagram?: string | null;
   pinterest?: string | null;
-  Addresses?: AddressBlock[] | null;
   updatedAt?: string | null;
   createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "AddressBlock".
- */
-export interface AddressBlock {
-  address: {
-    streetAddress1?: string | null;
-    city?: string | null;
-    state?: string | null;
-    postalCode?: string | null;
-    serviceAddy: string | Job;
-  };
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'address';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -705,31 +728,9 @@ export interface ShareablesSelect<T extends boolean = true> {
   facebook?: T;
   instagram?: T;
   pinterest?: T;
-  Addresses?:
-    | T
-    | {
-        address?: T | AddressBlockSelect<T>;
-      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "AddressBlock_select".
- */
-export interface AddressBlockSelect<T extends boolean = true> {
-  address?:
-    | T
-    | {
-        streetAddress1?: T;
-        city?: T;
-        state?: T;
-        postalCode?: T;
-        serviceAddy?: T;
-      };
-  id?: T;
-  blockName?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
