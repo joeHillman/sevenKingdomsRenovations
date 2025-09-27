@@ -102,6 +102,25 @@ export const Jobs: CollectionConfig = {
       relationTo: 'users',
     },
     {
+      name: 'isPrimaryContact',
+      label: 'Check if NOT the contact person.',
+      type: 'checkbox',
+    },
+    {
+      name: 'contactPerson',
+      label: 'Conatct Person',
+      type: 'relationship',
+      relationTo: 'users',
+      admin: {
+        description: 'Use if the contact person is different than who is paying, otherwise leave it blank.',
+        condition: (data) => {
+          if(data.isPrimaryContact) {
+            return true;
+          } { return false }
+       },
+      },
+    },
+    {
       name: 'jobLocation',
       label: 'Job is located at',
       type: 'relationship',
@@ -181,25 +200,6 @@ export const Jobs: CollectionConfig = {
           if(data.status === 'canceled') { return true }
           return false;
         },
-      },
-    },
-    {
-      name: 'isPrimaryContact',
-      label: 'Check if NOT the contact person.',
-      type: 'checkbox',
-    },
-    {
-      name: 'contactPerson',
-      label: 'Conatct Person',
-      type: 'relationship',
-      relationTo: 'users',
-      admin: {
-        description: 'Use if the contact person is different than who is paying, otherwise leave it blank.',
-        condition: (data) => {
-          if(data.isPrimaryContact) {
-            return true;
-          } { return false }
-       },
       },
     },
     {

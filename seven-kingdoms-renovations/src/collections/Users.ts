@@ -186,5 +186,12 @@ export const Users: CollectionConfig = {
       collection: 'jobs',
       on: 'jobIsFor',
     },
+    {
+      name: 'preferredContactFor',
+      label: 'Is Preferred Contact For',
+      type: 'join',
+      collection: 'jobs',
+      on: 'contactPerson',
+    },
   ],
 }
