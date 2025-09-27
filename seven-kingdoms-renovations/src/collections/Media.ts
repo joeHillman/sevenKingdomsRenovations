@@ -112,13 +112,13 @@ export const Media: CollectionConfig = {
       type: 'relationship',
       relationTo: 'jobs',
     },
-    {
-      name: 'associatedInteractions',
-      label: 'Associated Interactions',
-      type: 'join',
-      collection: 'interactions',
-      on: 'Is for',
-    },
+    // {
+    //   name: 'associatedInteractions',
+    //   label: 'Associated Interactions',
+    //   type: 'join',
+    //   collection: 'interactions',
+    //   on: 'Is for',
+    // },
   ],
   upload: {
     displayPreview: true,

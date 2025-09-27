@@ -72,8 +72,6 @@ export interface Config {
     jobs: Job;
     media: Media;
     galleries: Gallery;
-    interactions: Interaction;
-    teams: Team;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -86,13 +84,11 @@ export interface Config {
     };
     users: {
       associatedJobs: 'jobs';
+      preferredContactFor: 'jobs';
     };
     jobs: {
       associatedGalleries: 'galleries';
       associatedPhotos: 'media';
-    };
-    media: {
-      associatedInteractions: 'interactions';
     };
   };
   collectionsSelect: {
@@ -101,8 +97,6 @@ export interface Config {
     jobs: JobsSelect<false> | JobsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     galleries: GalleriesSelect<false> | GalleriesSelect<true>;
-    interactions: InteractionsSelect<false> | InteractionsSelect<true>;
-    teams: TeamsSelect<false> | TeamsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -213,6 +207,11 @@ export interface User {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
+  preferredContactFor?: {
+    docs?: (string | Job)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -266,11 +265,6 @@ export interface Media {
   typeOf?: ('before' | 'working' | 'after' | 'process' | 'demonstration' | 'avatar' | 'jobSite' | 'example') | null;
   alt: string;
   photoIsFor?: (string | null) | Job;
-  associatedInteractions?: {
-    docs?: (string | Interaction)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -323,6 +317,11 @@ export interface Job {
    * The person who pays for the job and likely the contact person.
    */
   jobIsFor: string | User;
+  isPrimaryContact?: boolean | null;
+  /**
+   * Use if the contact person is different than who is paying, otherwise leave it blank.
+   */
+  contactPerson?: (string | null) | User;
   jobLocation?: (string | null) | ServiceAddress;
   /**
    * Emails or texts will be send when this value is saved.
@@ -335,11 +334,6 @@ export interface Job {
   specialInstructions?: string | null;
   reasonForHold?: string | null;
   reasonForCancel?: string | null;
-  isPrimaryContact?: boolean | null;
-  /**
-   * Use if the contact person is different than who is paying, otherwise leave it blank.
-   */
-  contactPerson?: (string | null) | User;
   associatedGalleries?: {
     docs?: (string | Gallery)[];
     hasNextPage?: boolean;
@@ -371,42 +365,6 @@ export interface Gallery {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "interactions".
- */
-export interface Interaction {
-  id: string;
-  /**
-   * Feedback is visble to the boss and testimonial is visible to the public, after approval.
-   */
-  'type of'?: ('feedback' | 'testimonial') | null;
-  status?: ('new' | 'submitted' | 'approved') | null;
-  content?: string | null;
-  'Is for'?: (string | null) | Media;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Designed for large projects with multiple roles, trades, etc...
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "teams".
- */
-export interface Team {
-  id: string;
-  pageMeta: Meta;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Meta".
- */
-export interface Meta {
-  title: string;
-  description: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -431,14 +389,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'galleries';
         value: string | Gallery;
-      } | null)
-    | ({
-        relationTo: 'interactions';
-        value: string | Interaction;
-      } | null)
-    | ({
-        relationTo: 'teams';
-        value: string | Team;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -529,6 +479,7 @@ export interface UsersSelect<T extends boolean = true> {
       };
   avatar?: T;
   associatedJobs?: T;
+  preferredContactFor?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -554,14 +505,14 @@ export interface JobsSelect<T extends boolean = true> {
   title?: T;
   jobReminders?: T;
   jobIsFor?: T;
+  isPrimaryContact?: T;
+  contactPerson?: T;
   jobLocation?: T;
   status?: T;
   scheduledFor?: T;
   specialInstructions?: T;
   reasonForHold?: T;
   reasonForCancel?: T;
-  isPrimaryContact?: T;
-  contactPerson?: T;
   associatedGalleries?: T;
   associatedPhotos?: T;
   id?: T;
@@ -580,7 +531,6 @@ export interface MediaSelect<T extends boolean = true> {
   typeOf?: T;
   alt?: T;
   photoIsFor?: T;
-  associatedInteractions?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -642,35 +592,6 @@ export interface GalleriesSelect<T extends boolean = true> {
       };
   updatedAt?: T;
   createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "interactions_select".
- */
-export interface InteractionsSelect<T extends boolean = true> {
-  'type of'?: T;
-  status?: T;
-  content?: T;
-  'Is for'?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "teams_select".
- */
-export interface TeamsSelect<T extends boolean = true> {
-  pageMeta?: T | MetaSelect<T>;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Meta_select".
- */
-export interface MetaSelect<T extends boolean = true> {
-  title?: T;
-  description?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
