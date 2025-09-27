@@ -58,13 +58,13 @@ export const Media: CollectionConfig = {
         type: 'text',
       },
       {
-        label: 'Media Tags',
         name: 'mediaTags',
+        label: 'Media Tags',
         type: 'select',
-        hasMany: true,
         admin: {
           description: `Process is for a walkthru, demonstration is for a presentation. Job site is for job image, example is for info from client.`
         },
+        hasMany: true,
         options: [...typeOfOptions, ...tagOptions],
       },
       {
@@ -87,12 +87,13 @@ export const Media: CollectionConfig = {
           description: 'For now, you\'ll need to manage a single one being selected.',
           condition: (data) => {
             if(data.forGallery) { return true }
+            return false;
           }
         },
       },
     {
-      label: 'Type Of',
       name: 'typeOf',
+      label: 'Type Of',
       type: 'select',
       admin: {
         description: `Process is for a walkthru, demonstration is for a presentation. Job site is for job image, example is for info from client.`
@@ -101,28 +102,24 @@ export const Media: CollectionConfig = {
     },
     {
       name: 'alt',
+      label: 'Alt Text',
       type: 'text',
       required: true,
     },
     {
-      name: 'Photo is for',
+      name: 'photoIsFor',
+      label: 'Photo is for',
       type: 'relationship',
       relationTo: 'jobs',
     },
     {
       name: 'associatedInteractions',
+      label: 'Associated Interactions',
       type: 'join',
       collection: 'interactions',
       on: 'Is for',
-      // admin: {
-      //   condition: (data) => {
-      //     if(data.options.value === 'before' || data.options.value === 'working' || data.options.value === 'after') { return true }
-      //   },
-      // },
     },
   ],
-  // upload: true,
-  // these are from payload docs, nothing set in stone
   upload: {
     displayPreview: true,
     imageSizes: [

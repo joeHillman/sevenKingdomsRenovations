@@ -265,7 +265,7 @@ export interface Media {
    */
   typeOf?: ('before' | 'working' | 'after' | 'process' | 'demonstration' | 'avatar' | 'jobSite' | 'example') | null;
   alt: string;
-  'Photo is for'?: (string | null) | Job;
+  photoIsFor?: (string | null) | Job;
   associatedInteractions?: {
     docs?: (string | Interaction)[];
     hasNextPage?: boolean;
@@ -579,7 +579,7 @@ export interface MediaSelect<T extends boolean = true> {
   coverImage?: T;
   typeOf?: T;
   alt?: T;
-  'Photo is for'?: T;
+  photoIsFor?: T;
   associatedInteractions?: T;
   updatedAt?: T;
   createdAt?: T;

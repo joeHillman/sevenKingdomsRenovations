@@ -23,6 +23,7 @@ export const ServiceAddresses: CollectionConfig = {
     // // address is required to save so this won't need a hook
     {
       name: 'fullAddress',
+      label: 'Full Address',
       type: 'text',
       admin: {
         placeholder: 'read below...',

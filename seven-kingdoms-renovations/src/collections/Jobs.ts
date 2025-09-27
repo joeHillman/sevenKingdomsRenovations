@@ -79,6 +79,7 @@ export const Jobs: CollectionConfig = {
   fields: [
     {
       name: 'title',
+      label: 'Title',
       type: 'text',
       admin: {
         description: 'This is how the job is displayed on your site.'
@@ -87,21 +88,18 @@ export const Jobs: CollectionConfig = {
     {
       name: 'jobReminders',
       label: 'Reminders',
-      defaultValue: 'No Reminders',
       type: 'textarea',
-      admin: {
-        width: '20',
-      },
+      defaultValue: 'No Reminders',
     },
     {
       name: 'jobIsFor',
       label: 'Job is For',
       type: 'relationship',
-      required: true,
-      relationTo: 'users',
       admin: {
         description: 'The person who pays for the job and likely the contact person.'
       },
+      required: true,
+      relationTo: 'users',
     },
     {
       name: 'jobLocation',
@@ -216,10 +214,11 @@ export const Jobs: CollectionConfig = {
       label: 'Associated Photos',
       type: 'join',
       collection: 'media',
-      on: 'Photo is for'
+      on: 'photoIsFor',
     },
     {
       name: 'id',
+      label: 'ID',
       type: 'text',
       admin: {
         readOnly: true,
