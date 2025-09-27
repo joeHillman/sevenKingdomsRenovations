@@ -5,6 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { isAdmin, isAdminFieldLevel } from '@/access/isAdmin';
 import { isAdminOrSelf } from '@/access/isAdminOrSelf';
 
+const emailNotifierString = 'Emails or texts will be send when this value is saved.'
+
 export const Jobs: CollectionConfig = {
   slug: 'jobs',
   // need a better field name for this, it's link to the media
@@ -21,9 +23,16 @@ export const Jobs: CollectionConfig = {
   // user creation, welcome email
   // job update email
   // feedback to review email...
+  // https://nodemailer.com/message
+  // // to: client or admin // cc: client or admin
+  // clientList, adminList
+  // // need list of people to email
   hooks: {
     afterChange: [
       ({ doc, operation, req }) => {
+        // need to tweak all the email routing...
+        // // global email is the owner
+        // // job owner or contact person // cc: owner
         console.log(operation, 'OP')
         if(operation === 'create') {
           req.payload.sendEmail({
@@ -37,8 +46,8 @@ export const Jobs: CollectionConfig = {
           if(doc.status === 'scheduled') {
             req.payload.sendEmail({
               to: 'joerhillman@gmail.com',
-              subject: `The ${doc.title} job has been scheduled. `,
-              text: `The ${doc.title} job has been scheduled for ${doc.scheduledFor}. ${doc?.specialInstructions && doc.specialInstructions}`,
+              subject: `The ${doc.title} job has been scheduled or rescheduled. `,
+              text: `The ${doc.title} job has been scheduled or rescheduled for ${doc.scheduledFor}. ${doc?.specialInstructions && doc.specialInstructions}`,
             });
           }
           if(doc.status === 'inProgress') {
@@ -71,12 +80,28 @@ export const Jobs: CollectionConfig = {
     {
       name: 'title',
       type: 'text',
+      admin: {
+        description: 'This is how the job is displayed on your site.'
+      },
     },
     {
-      name: 'id',
-      type: 'text',
-      defaultValue: uuidv4(),
+      name: 'jobReminders',
+      label: 'Reminders',
+      defaultValue: 'No Reminders',
+      type: 'textarea',
+      admin: {
+        width: '20',
+      },
+    },
+    {
+      name: 'jobIsFor',
+      label: 'Job is For',
+      type: 'relationship',
       required: true,
+      relationTo: 'users',
+      admin: {
+        description: 'The person who pays for the job and likely the contact person.'
+      },
     },
     {
       name: 'jobLocation',
@@ -86,7 +111,11 @@ export const Jobs: CollectionConfig = {
     },
     {
       name: 'status',
+      label: 'Status',
       type: 'select',
+      admin: {
+        description: emailNotifierString,
+      },
       options: [
         {
           label: 'Pending',
@@ -115,10 +144,12 @@ export const Jobs: CollectionConfig = {
       label: 'Scheduled For',
       type: 'date',
       admin: {
-        condition: (data, siblingData, {user}) => {
-          if(data.status === 'scheduled') { return true }
-        }
-      }
+        placeholder: 'Not Scheduled',
+        description: emailNotifierString,
+        date: {
+          displayFormat: 'MMMM d yyy'
+        },
+      },
     },
     {
       name: 'specialInstructions',
@@ -126,7 +157,9 @@ export const Jobs: CollectionConfig = {
       type: 'text',
       admin: {
         condition: (data, siblingData, {user}) => {
-          if(data.status === 'scheduled') { return true }
+          console.log(data, 'DATA')
+          if(data.status !== 'pending') { return true }
+          return false;
         }
       },
     },
@@ -137,6 +170,7 @@ export const Jobs: CollectionConfig = {
       admin: {
         condition: (data, siblingData, { user }) => {
           if(data.status === 'onHold') { return true }
+          return false;
         },
       },
     },
@@ -147,26 +181,52 @@ export const Jobs: CollectionConfig = {
       admin: {
         condition: (data, siblingData, { user }) => {
           if(data.status === 'canceled') { return true }
+          return false;
         },
       },
     },
     {
-      name: 'Job is for',
+      name: 'isPrimaryContact',
+      label: 'Check if NOT the contact person.',
+      type: 'checkbox',
+    },
+    {
+      name: 'contactPerson',
+      label: 'Conatct Person',
       type: 'relationship',
       relationTo: 'users',
+      admin: {
+        description: 'Use if the contact person is different than who is paying, otherwise leave it blank.',
+        condition: (data) => {
+          if(data.isPrimaryContact) {
+            return true;
+          } { return false }
+       },
+      },
     },
     {
       name: 'associatedGalleries',
+      label: 'Associated Galleries',
       type: 'join',
       collection: 'galleries',
       on: 'galleryForJob'
     },
     {
       name: 'associatedPhotos',
+      label: 'Associated Photos',
       type: 'join',
       collection: 'media',
       on: 'Photo is for'
-    }
+    },
+    {
+      name: 'id',
+      type: 'text',
+      admin: {
+        readOnly: true,
+      },
+      defaultValue: uuidv4(),
+      required: true,
+    },
   ],
   upload: false,
 }

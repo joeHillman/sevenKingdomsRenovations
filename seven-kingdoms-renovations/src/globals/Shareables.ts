@@ -1,6 +1,7 @@
 import { GlobalConfig } from 'payload'
 import { isAdmin, isAdminFieldLevel } from '@/access/isAdmin';
 import { isAdminOrSelf } from '@/access/isAdminOrSelf';
+import { AddressBlock } from '@/blocks/AddressBlock/config';
 
 export const Shareables: GlobalConfig = {
   slug: 'shareables',
@@ -13,7 +14,6 @@ export const Shareables: GlobalConfig = {
   },
   fields: [
     {
-      name: 'contactInfo',
       label: 'Contact Info',
       type: 'collapsible',
       admin: {
@@ -33,7 +33,6 @@ export const Shareables: GlobalConfig = {
       ],
     },
     {
-      name: 'socialMedia',
       label: 'Social Media',
       type: 'collapsible',
       admin: {

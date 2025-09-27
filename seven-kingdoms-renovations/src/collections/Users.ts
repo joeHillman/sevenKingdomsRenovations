@@ -7,7 +7,7 @@ export const Users: CollectionConfig = {
   slug: 'users',
   auth: true,
   admin: {
-    useAsTitle: 'email',
+    useAsTitle: 'nameAsTitle',
   },
   access: {
     // only admins can create users
@@ -48,6 +48,27 @@ export const Users: CollectionConfig = {
       ]
     },
     {
+      name: 'nameAsTitle',
+      label: 'User Name',
+      type: 'text',
+      admin: {
+        placeholder: 'read below...',
+        readOnly: true,
+        description: 'This field is not editable and will autopopulate with the full name once it\'s been saved.',
+        condition: (data) => {
+          if (data?.personalInfo?.firstName && data?.personalInfo?.lastName) {
+            
+            const { firstName, lastName } = data.personalInfo;
+            data.nameAsTitle = `${firstName} ${lastName}`;
+            return true
+          }
+          else {
+            data.nameAsTitle = null;
+            return false }
+        }
+      },
+    },
+    {
       label: 'Profile Info',
       type: 'collapsible',
       admin: {
@@ -62,14 +83,19 @@ export const Users: CollectionConfig = {
 
             {
               name: 'firstName',
+              label: 'First Name',
               type: 'text',
+              required: true,
             },
             {
               name: 'lastName',
+              label: 'Last Name',
               type: 'text',
+              required: true,
             },
             {
               name: 'nickname',
+              label: 'Preferred Name',
               type: 'text',
             },
           ],
@@ -79,6 +105,9 @@ export const Users: CollectionConfig = {
           label: 'Client Service Addresses',
           type: 'relationship',
           relationTo: 'serviceAddresses',
+          admin: {
+            allowCreate: false,
+          },
           hasMany: true,
         },
         {
@@ -88,10 +117,8 @@ export const Users: CollectionConfig = {
           fields: [
             {
               name: 'generalContactPreference',
+              label: 'General Contact Preference',
               type: 'radio',
-              admin: {
-                description: 'You can override this at a job level.'
-              },
               options: [
                 {
                   label: 'Email',
@@ -109,6 +136,7 @@ export const Users: CollectionConfig = {
             },
             {
               name: 'email',
+              label: 'Email',
               type: 'email',
               admin: {
                 condition: (data) => {
@@ -120,6 +148,7 @@ export const Users: CollectionConfig = {
             },
             {
               name: 'number',
+              label: 'Phone Number',
               type: 'number',
               admin: {
                 condition: (data) => {
@@ -146,14 +175,16 @@ export const Users: CollectionConfig = {
     },
     {
       name: 'avatar',
+      label: 'Avatar',
       type: 'upload',
       relationTo: 'media',
     },
     {
       name: 'associatedJobs',
+      label: 'Associated Jobs',
       type: 'join',
       collection: 'jobs',
-      on: 'Job is for',
+      on: 'jobIsFor',
     },
   ],
 }
